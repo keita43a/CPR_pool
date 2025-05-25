@@ -5,23 +5,23 @@ class C(BaseConstants):
     NAME_IN_URL = 'try'
     PLAYERS_PER_GROUP = 12
 
-    # 练习与正式轮次
+    # 练习与正式轮次 / 練習と本番のラウンド
     PRACTICE_ROUNDS = 4
     OFFICIAL_ROUNDS = 42
     NUM_ROUNDS = PRACTICE_ROUNDS + OFFICIAL_ROUNDS  # 46 total
 
-    # 参数
+    # 参数 / パラメータ
     C_LOW = 2
     C_HIGH = 4
     A = 150
     B_HIGH = 0.5
     B_LOW = 1.5
 
-    # 默认
+    # 默认 / デフォルト
     DEFAULT_INSTITUTION = 'IND'
     DEFAULT_STOCK_SYMBOL = 'H'
 
-    # 模式定义
+    # 模式定义 / パターン定義
     PRACTICE_PATTERNS = {
         1: {'institution': 'IND',  'stock': 'H'},
         2: {'institution': 'IND',  'stock': 'L'},
@@ -37,7 +37,7 @@ class C(BaseConstants):
         6: {'institution': 'VOTE', 'stock': 'L'},
     }
 
-    # 页面上显示
+    # 页面上显示 / ページ上の表示
     STOCK_LABELS = {
         'H': 'High resource (b=0.5)',
         'L': 'Low resource (b=1.5)',
@@ -60,7 +60,7 @@ def creating_session(self):
     print(f"=== creating_session triggered for round {self.round_number} ===")
     r = self.round_number
 
-    # 设置模式：练习 or 正式
+    # 设置模式：练习 or 正式 / モード設定：練習 or 本番
     if r <= C.PRACTICE_ROUNDS:
         idx = r
         pattern = C.PRACTICE_PATTERNS[idx]
@@ -79,11 +79,11 @@ def creating_session(self):
     self.institution = pattern['institution']
     self.stock       = pattern['stock']
 
-    # 只在第1轮：分配角色并写入 participant.vars
+    # 只在第1轮：分配角色并写入 participant.vars / 第1ラウンドのみ：役割を割り当ててparticipant.varsに記録
     if r == 1:
         for group in self.get_groups():
             players = group.get_players()
-            # 更稳妥的方法：打乱顺序后分配
+            # 更稳妥的方法：打乱顺序后分配 / より安全な方法：順序をシャッフルしてから割り当て
             random.shuffle(players)
             half = len(players) // 2
             for i, p in enumerate(players):
@@ -91,7 +91,7 @@ def creating_session(self):
                 p.participant.vars['is_highliner'] = is_highliner
                 print(f"[Round 1 Assignment] Player {p.id_in_group} → {'Highliner' if is_highliner else 'Lowliner'}")
 
-    # 每轮都读回角色变量
+    # 每轮都读回角色变量 / 毎ラウンド役割変数を読み戻し
     for p in self.get_players():
         print(f"[DEBUG] p.participant.vars['is_highliner'] = {p.participant.vars.get('is_highliner')}")
 
@@ -148,12 +148,12 @@ class Instruction(Page):
         }
 
 class PracticeEnd(Page):
-    """练习结束提示"""
+    """练习结束提示 / 練習終了の通知"""
     @staticmethod
     def is_displayed(player: Player):
         return player.round_number == C.PRACTICE_ROUNDS + 1
     def vars_for_template(self):
-        return {'msg': '练习结束，正式实验现在开始！'}
+        return {'msg': '练习结束，正式实验现在开始！'}  # 練習終了、本実験を開始します！
 
 
 class Vote(Page):
@@ -179,9 +179,9 @@ class Effort_input(Page):
     @staticmethod
     def vars_for_template(player: Player):
         ss = player.subsession
-        # 计算一下是练习阶段还是正式阶段
+        # 计算一下是练习阶段还是正式阶段 / 練習段階か本番段階かを計算
         is_practice = (ss.mode_type == 'practice')
-        # 首字母大写用于展示
+        # 首字母大写用于展示 / 表示用に最初の文字を大文字にする
         mode_type_display = ss.mode_type.capitalize() if ss.mode_type else ''
 
         return {
@@ -190,8 +190,8 @@ class Effort_input(Page):
             'role': 'Highliner' if player.is_highliner else 'Lowliner',
             'current_round': ss.round_number,
             'total_rounds': C.NUM_ROUNDS,
-            'mode_type_display': mode_type_display,  # 用于页面上显示 “Practice” 或 “Official”
-            'is_practice': is_practice,              # 用于模板里的 if 判断
+            'mode_type_display': mode_type_display,  # 用于页面上显示 "Practice" 或 "Official" / ページ上で"Practice"または"Official"を表示するため
+            'is_practice': is_practice,              # 用于模板里的 if 判断 / テンプレート内のif判断用
             'mode_index': ss.mode_index,
             'mode_round': ss.mode_round,
             'institution_for_display': ss.institution,
@@ -214,11 +214,11 @@ class Results(Page):
         gp = player.group
         ss = player.subsession
 
-        # 练习/正式 判断
+        # 练习/正式 判断 / 練習/本番 判定
         is_practice = (ss.mode_type == 'practice')
-        # 首字母大写的 Phase 文本
+        # 首字母大写的 Phase 文本 / 最初の文字を大文字にしたPhaseテキスト
         mode_type_display = ss.mode_type.capitalize() if ss.mode_type else ''
-        # 每个模式的轮数：练习=1，正式=OFFICIAL_ROUNDS/6=7
+        # 每个模式的轮数：练习=1，正式=OFFICIAL_ROUNDS/6=7 / 各モードのラウンド数：練習=1、本番=OFFICIAL_ROUNDS/6=7
         pattern_length = 1 if is_practice else C.OFFICIAL_ROUNDS // len(C.OFFICIAL_PATTERNS)
 
         return {
@@ -238,14 +238,13 @@ class Results(Page):
 
 
 class EndPage(Page):
-    """实验结束页"""
+    """实验结束页 / 実験終了ページ"""
     @staticmethod
     def is_displayed(player: Player):
         return player.round_number == C.NUM_ROUNDS
     def vars_for_template(self):
         return {
-            'msg': '実験終わりました。誠にありがとうございました。現在、下のGoogle　Formを提出いたします：',
-            'form_url': 'https://forms.gle/LouNxwNgSJkBEh3X8'
+            'msg': '実験はこれで終了です。ご参加いただきありがとうございました。次に、参加者を対象としたアンケートにお答えください。'
         }
 
 
