@@ -8,7 +8,7 @@ SESSION_CONFIGS = [
         num_demo_participants=12,
         real_world_currency_per_point=1.00,
         participation_fee=0.00,
-        doc='Fishery experiment with 4 practice rounds and 42 formal rounds',
+        doc='4回の練習ラウンドと42回の本番ラウンドからなる漁業の操業を模した実験です。',
     ),
 ]
 
@@ -29,6 +29,8 @@ REAL_WORLD_CURRENCY_CODE = 'JPY'
 USE_POINTS = True
 POINTS_DECIMAL_PLACES = 2
 REAL_WORLD_CURRENCY_DECIMAL_PLACES = 0
+ADMIN_USERNAME = 'admin'
+ADMIN_PASSWORD = 'sakailab0526'
 
 INSTALLED_APPS = ['otree', 'try']
 
