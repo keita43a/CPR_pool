@@ -1,0 +1,14 @@
+{% extends "global/Page.html" %}
+{% load otree static %}
+
+{% block title %}Practice Complete{% endblock %}
+
+{% block content %}
+  <div class="alert alert-info">
+    <h3>{{ msg }}</h3>
+  </div>
+
+  <p>Your practice rounds are over. Click “Next” to begin the formal experiment.</p>
+
+  {% next_button %}
+{% endblock %}

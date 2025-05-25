@@ -1,0 +1,30 @@
+{% extends "global/Page.html" %}
+{% load otree static %}
+
+{% block title %}Round Results{% endblock %}
+
+{% block content %}
+  <h4>Round Summary</h4>
+
+  <p><strong>Phase:</strong> {{ mode_type_display }} phase</p>
+  <p><strong>Mode {{ mode_index }}:</strong>
+    Round {{ mode_round }} of {{ pattern_length }}
+  </p>
+  <p><strong>Overall Round:</strong> {{ current_round }} / {{ total_rounds }}</p>
+
+  <p><strong>Your Role:</strong> {{ role }}</p>
+  <p><strong>Institution Used:</strong> {{ player.subsession.institution }}</p>
+  <p><strong>Resource Level:</strong> {{ stock_env }}</p>
+
+  <hr>
+  <p><strong>Total Group Harvest (H):</strong> {{ total_H }}</p>
+
+  <hr>
+  <h5>Your Performance</h5>
+  <p><strong>Your Effort:</strong> {{ my_effort }}</p>
+  <p><strong>Your Payoff:</strong> {{ my_payoff }}</p>
+
+  <hr>
+  <p>Click “Next” to continue.</p>
+  {% next_button %}
+{% endblock %}

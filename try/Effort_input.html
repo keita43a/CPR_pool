@@ -1,0 +1,22 @@
+{% extends "global/Page.html" %}
+{% load otree static %}
+
+{% block title %}Effort Decision{% endblock %}
+
+{% block content %}
+  <p>Please enter your effort level for this round.</p>
+
+  {% formfields %}
+  <button class="btn btn-primary">Submit</button>
+
+  <hr>
+
+  <p><strong>Phase:</strong> {{ mode_type_display }} </p>
+  <p><strong>Mode {{ mode_index }}:</strong>
+     Round {{ mode_round }} of {% if is_practice %}1{% else %}7{% endif %}
+  </p>
+  <p><strong>Overall Round:</strong> {{ current_round }} / {{ total_rounds }}</p>
+  <p><strong>Your Role:</strong> {{ role }}</p>
+  <p><strong>Institution:</strong> {{ institution_for_display }}</p>
+  <p><strong>Resource Level:</strong> {{ stock_label }}</p>
+{% endblock %}

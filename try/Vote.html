@@ -1,0 +1,39 @@
+{% extends "global/Page.html" %}
+{% load otree static %}
+
+{% block title %}Vote on Institution{% endblock %}
+
+{% block content %}
+  <p>
+    Please vote for the institutional setting you prefer for this round:
+  </p>
+
+  <form method="post">
+    {% csrf_token %}
+    {% formfield player.voted_for_pooling with label="Do you want to adopt the pooling system this round?" %}
+    <button class="btn btn-primary" type="submit">Submit Vote</button>
+  </form>
+
+  <hr>
+
+  <p><strong>Your Role:</strong>
+    {% if player.is_highliner %}Highliner{% else %}Lowliner{% endif %}
+  </p>
+
+  <p><strong>Stock Environment:</strong>
+    {{ Constants.STOCK_LABELS[subsession.stock] }}
+  </p>
+
+  <p><strong>Round:</strong>
+    {{ player.round_number }} / {{ Constants.NUM_ROUNDS }}
+  </p>
+
+  <p><strong>Mode:</strong>
+    {{ subsession.mode_type|capfirst }} mode {{ subsession.mode_index }}
+    (round {{ subsession.mode_round }})
+  </p>
+
+  <p><strong>
+    This round will use pooling <em>only</em> if <em>all</em> players vote for it.
+  </strong></p>
+{% endblock %}

@@ -1,0 +1,261 @@
+from otree.api import *
+import random
+
+class C(BaseConstants):
+    NAME_IN_URL = 'try'
+    PLAYERS_PER_GROUP = 12
+
+    # 练习与正式轮次
+    PRACTICE_ROUNDS = 4
+    OFFICIAL_ROUNDS = 42
+    NUM_ROUNDS = PRACTICE_ROUNDS + OFFICIAL_ROUNDS  # 46 total
+
+    # 参数
+    C_LOW = 2
+    C_HIGH = 4
+    A = 150
+    B_HIGH = 0.5
+    B_LOW = 1.5
+
+    # 默认
+    DEFAULT_INSTITUTION = 'IND'
+    DEFAULT_STOCK_SYMBOL = 'H'
+
+    # 模式定义
+    PRACTICE_PATTERNS = {
+        1: {'institution': 'IND',  'stock': 'H'},
+        2: {'institution': 'IND',  'stock': 'L'},
+        3: {'institution': 'POOL', 'stock': 'H'},
+        4: {'institution': 'POOL', 'stock': 'L'},
+    }
+    OFFICIAL_PATTERNS = {
+        1: {'institution': 'IND',  'stock': 'H'},
+        2: {'institution': 'IND',  'stock': 'L'},
+        3: {'institution': 'POOL', 'stock': 'H'},
+        4: {'institution': 'POOL', 'stock': 'L'},
+        5: {'institution': 'VOTE', 'stock': 'H'},
+        6: {'institution': 'VOTE', 'stock': 'L'},
+    }
+
+    # 页面上显示
+    STOCK_LABELS = {
+        'H': 'High resource (b=0.5)',
+        'L': 'Low resource (b=1.5)',
+    }
+    STOCK_B = {
+        'H': B_HIGH,
+        'L': B_LOW,
+    }
+
+       
+class Subsession(BaseSubsession):
+    mode_type   = models.StringField(initial='')
+    mode_index  = models.IntegerField(initial=0)
+    mode_round  = models.IntegerField(initial=0)
+    institution = models.StringField(initial=C.DEFAULT_INSTITUTION)
+    stock       = models.StringField(initial=C.DEFAULT_STOCK_SYMBOL)
+    import random
+
+def creating_session(self):
+    print(f"=== creating_session triggered for round {self.round_number} ===")
+    r = self.round_number
+
+    # 设置模式：练习 or 正式
+    if r <= C.PRACTICE_ROUNDS:
+        idx = r
+        pattern = C.PRACTICE_PATTERNS[idx]
+        self.mode_type  = 'practice'
+        self.mode_index = idx
+        self.mode_round = 1
+    else:
+        off_r = r - C.PRACTICE_ROUNDS
+        block_size = C.OFFICIAL_ROUNDS // len(C.OFFICIAL_PATTERNS)
+        idx = ((off_r - 1) // block_size) + 1
+        pattern = C.OFFICIAL_PATTERNS[idx]
+        self.mode_type  = 'official'
+        self.mode_index = idx
+        self.mode_round = ((off_r - 1) % block_size) + 1
+
+    self.institution = pattern['institution']
+    self.stock       = pattern['stock']
+
+    # 只在第1轮：分配角色并写入 participant.vars
+    if r == 1:
+        for group in self.get_groups():
+            players = group.get_players()
+            # 更稳妥的方法：打乱顺序后分配
+            random.shuffle(players)
+            half = len(players) // 2
+            for i, p in enumerate(players):
+                is_highliner = (i < half)
+                p.participant.vars['is_highliner'] = is_highliner
+                print(f"[Round 1 Assignment] Player {p.id_in_group} → {'Highliner' if is_highliner else 'Lowliner'}")
+
+    # 每轮都读回角色变量
+    for p in self.get_players():
+        print(f"[DEBUG] p.participant.vars['is_highliner'] = {p.participant.vars.get('is_highliner')}")
+
+
+class Group(BaseGroup):
+    is_pooling   = models.BooleanField(initial=False)
+    vote_result  = models.BooleanField(initial=False)
+    stock_env    = models.StringField()
+    total_H      = models.FloatField()
+
+    def set_institution(self):
+        inst = self.subsession.institution
+        if inst == 'VOTE':
+            self.vote_result = all(p.voted_for_pooling for p in self.get_players())
+            self.is_pooling  = self.vote_result
+        else:
+            self.is_pooling  = (inst == 'POOL')
+            self.vote_result = False
+
+    def set_payoffs(self):
+        players = self.get_players()
+        self.stock_env = self.subsession.stock
+        H = sum(p.effort for p in players)
+        self.total_H = H
+        b = C.STOCK_B[self.stock_env]
+        for p in players:
+            h = p.effort
+            c = C.C_HIGH if p.is_highliner else C.C_LOW
+            pi = h * (C.A - b * H) - c * h**2
+            p.payoff_raw = pi
+            p.payoff     = pi
+
+
+class Player(BasePlayer):
+    voted_for_pooling = models.BooleanField(blank=True, initial=False)
+    effort = models.FloatField(min=0, initial=0.0)
+    payoff_raw = models.FloatField(initial=0.0)
+
+    @property
+    def is_highliner(self):
+        return self.participant.vars.get('is_highliner', False)
+
+
+# PAGES
+class Instruction(Page):
+    @staticmethod
+    def is_displayed(player: Player):
+        return player.round_number == 1
+
+    @staticmethod
+    def vars_for_template(player: Player):
+        return {
+            'Constants': C
+        }
+
+class PracticeEnd(Page):
+    """练习结束提示"""
+    @staticmethod
+    def is_displayed(player: Player):
+        return player.round_number == C.PRACTICE_ROUNDS + 1
+    def vars_for_template(self):
+        return {'msg': '练习结束，正式实验现在开始！'}
+
+
+class Vote(Page):
+    form_model = 'player'
+    form_fields = ['voted_for_pooling']
+    @staticmethod
+    def is_displayed(player: Player):
+        return player.subsession.institution == 'VOTE'
+
+
+class VoteWaitPage(WaitPage):
+    title_text = "Please wait for all players to vote"
+    body_text  = "Other players are still voting."
+    @staticmethod
+    def is_displayed(player: Player):
+        return player.subsession.institution == 'VOTE'
+
+
+class Effort_input(Page):
+    form_model = 'player'
+    form_fields = ['effort']
+
+    @staticmethod
+    def vars_for_template(player: Player):
+        ss = player.subsession
+        # 计算一下是练习阶段还是正式阶段
+        is_practice = (ss.mode_type == 'practice')
+        # 首字母大写用于展示
+        mode_type_display = ss.mode_type.capitalize() if ss.mode_type else ''
+
+        return {
+            'stock_label': C.STOCK_LABELS[ss.stock],
+            'b': C.B_HIGH if ss.stock == 'H' else C.B_LOW,
+            'role': 'Highliner' if player.is_highliner else 'Lowliner',
+            'current_round': ss.round_number,
+            'total_rounds': C.NUM_ROUNDS,
+            'mode_type_display': mode_type_display,  # 用于页面上显示 “Practice” 或 “Official”
+            'is_practice': is_practice,              # 用于模板里的 if 判断
+            'mode_index': ss.mode_index,
+            'mode_round': ss.mode_round,
+            'institution_for_display': ss.institution,
+            'is_highliner': player.is_highliner,
+        }
+
+
+class EffortWaitPage(WaitPage):
+    title_text = "Waiting for all to input efforts"
+    body_text  = "Other players are still inputting their efforts."
+    @staticmethod
+    def after_all_players_arrive(group: Group):
+        group.set_institution()
+        group.set_payoffs()
+
+
+class Results(Page):
+    @staticmethod
+    def vars_for_template(player: Player):
+        gp = player.group
+        ss = player.subsession
+
+        # 练习/正式 判断
+        is_practice = (ss.mode_type == 'practice')
+        # 首字母大写的 Phase 文本
+        mode_type_display = ss.mode_type.capitalize() if ss.mode_type else ''
+        # 每个模式的轮数：练习=1，正式=OFFICIAL_ROUNDS/6=7
+        pattern_length = 1 if is_practice else C.OFFICIAL_ROUNDS // len(C.OFFICIAL_PATTERNS)
+
+        return {
+            'stock_env':   C.STOCK_LABELS[gp.stock_env],
+            'total_H':     gp.total_H,
+            'my_effort':   player.effort,
+            'my_payoff':   player.payoff,
+            'role':        'Highliner' if player.is_highliner else 'Lowliner',
+            'current_round': ss.round_number,
+            'total_rounds':  C.NUM_ROUNDS,
+            'mode_type_display': mode_type_display,
+            'is_practice':      is_practice,
+            'mode_index':       ss.mode_index,
+            'mode_round':       ss.mode_round,
+            'pattern_length':   pattern_length,
+        }
+
+
+class EndPage(Page):
+    """实验结束页"""
+    @staticmethod
+    def is_displayed(player: Player):
+        return player.round_number == C.NUM_ROUNDS
+    def vars_for_template(self):
+        return {
+            'msg': '実験終わりました。誠にありがとうございました。現在、下のGoogle　Formを提出いたします：',
+            'form_url': 'https://forms.gle/LouNxwNgSJkBEh3X8'
+        }
+
+
+page_sequence = [
+    Instruction,
+    PracticeEnd,
+    Vote,
+    VoteWaitPage,
+    Effort_input,
+    EffortWaitPage,
+    Results,
+    EndPage,
+]

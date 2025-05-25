@@ -1,0 +1,71 @@
+{% extends "global/Page.html" %}
+{% load otree static %}
+
+{% block title %}Introduction{% endblock %}
+
+{% block content %}
+  <h2>Welcome to the Fishery Game Experiment</h2>
+
+  <p>
+    You and {{ Constants.PLAYERS_PER_GROUP }} participants form a group of {{ Constants.PLAYERS_PER_GROUP }} fishers.  
+    Each round, you choose how much effort to exert in harvesting fish.
+  </p>
+
+  <p>
+    There are two types of players: <strong>Highliners</strong> and <strong>Lowliners</strong>.  
+    Highliners are more productive per unit of effort; Lowliners less so.  
+    Your role will remain fixed throughout.
+  </p>
+
+  <h3>Experiment overview</h3>
+  <p><strong>Total rounds:</strong> {{ Constants.NUM_ROUNDS }} ({{ Constants.PRACTICE_ROUNDS }} practice, then {{ Constants.OFFICIAL_ROUNDS }} formal)</p>
+
+  <ul>
+    <li>
+      <strong>Practice phase:</strong> {{ Constants.PRACTICE_ROUNDS }} rounds, in {{ Constants.PRACTICE_ROUNDS }} practice modes (1 round each):
+      <ol>
+        <li>High resource, individual (IND)</li>
+        <li>Low resource, individual (IND)</li>
+        <li>High resource, pooling (POOL)</li>
+        <li>Low resource, pooling (POOL)</li>
+      </ol>
+    </li>
+    <li>
+      <strong>Formal phase:</strong> {{ Constants.OFFICIAL_ROUNDS }} rounds, in 6 modes (7 rounds each):
+      <ol>
+        <li>High resource, individual (IND)</li>
+        <li>Low resource, individual (IND)</li>
+        <li>High resource, pooling (POOL)</li>
+        <li>Low resource, pooling (POOL)</li>
+        <li>High resource, vote to pool (VOTE)</li>
+        <li>Low resource, vote to pool (VOTE)</li>
+      </ol>
+    </li>
+  </ul>
+
+  <h3>Voting</h3>
+  <p>
+    In the two VOTE modes, you will vote on adopting a 
+    <strong>pooling system</strong> (share total revenue equally) 
+    or keeping a <strong>decentralized system</strong> 
+    (each earns based on own harvest).  
+    Pooling only occurs if <strong>all agree</strong>.
+  </p>
+
+  <h3>Harvesting</h3>
+  <p>Your harvest depends on:</p>
+  <ul>
+    <li>Your effort</li>
+    <li>Your productivity (Highliner vs Lowliner)</li>
+    <li>Total group effort (congestion externality)</li>
+    <li>Resource availability (high vs low stock)</li>
+  </ul>
+
+  <p>
+    Read carefully and ask the experimenter if you have any questions.
+  </p>
+
+  <p><strong>Click "Next" to begin the practice phase.</strong></p>
+
+  {% next_button %}
+{% endblock %}
