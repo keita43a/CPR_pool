@@ -10,7 +10,7 @@
 
   <form method="post">
     {% csrf_token %}
-    {% formfield player.voted_for_pooling with label="Do you want to adopt the pooling system this round?" %}
+    {% formfield player.voted_for_pooling label="Do you want to adopt the pooling system this round?" %}
     <button class="btn btn-primary" type="submit">Submit Vote</button>
   </form>
 
