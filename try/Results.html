@@ -5,25 +5,23 @@
 {% block title %}ラウンド結果{% endblock %}
 
 {% block content %}
-  <h4>ラウンド概要</h4>
-
+  
+  <h4>あなたの成績</h4>
+  <p><strong>あなたの操業日数:</strong> {{ my_effort }}</p>
+  <p><strong>あなたの利得:</strong> {{ my_payoff }}</p>
+  <hr>  
+    
+  <h5>ラウンド概要</h5>
+  <p><strong>グループ総漁獲量（H）:</strong> {{ total_H }}</p>
+  <hr>
+  <p><strong>使用された制度:</strong> {{ player.subsession.institution }}</p>
+  <p><strong>漁場タイプ:</strong> {{ stock_env }}</p>
+  <hr>
   <p><strong>フェーズ:</strong> {{ mode_type_display }}フェーズ</p>
   <p><strong>モード {{ mode_index }}:</strong>
     ラウンド {{ mode_round }} / {{ pattern_length }}
   </p>
   <p><strong>全体ラウンド:</strong> {{ current_round }} / {{ total_rounds }}</p>
-
-  <p><strong>あなたの役割:</strong> {{ role }}</p>
-  <p><strong>使用された制度:</strong> {{ player.subsession.institution }}</p>
-  <p><strong>漁場タイプ:</strong> {{ stock_env }}</p>
-
-  <hr>
-  <p><strong>グループ総漁獲量（H）:</strong> {{ total_H }}</p>
-
-  <hr>
-  <h5>あなたの成績</h5>
-  <p><strong>あなたの操業日数:</strong> {{ my_effort }}</p>
-  <p><strong>あなたの利得:</strong> {{ my_payoff }}</p>
 
   <hr>
   <p>「次へ」をクリックして続行してください。</p>
