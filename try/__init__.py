@@ -3,11 +3,11 @@ import random
 
 class C(BaseConstants):
     NAME_IN_URL = 'try'
-    PLAYERS_PER_GROUP = 12
+    PLAYERS_PER_GROUP = 2
 
     # 练习与正式轮次 / 練習と本番のラウンド
     PRACTICE_ROUNDS = 4
-    OFFICIAL_ROUNDS = 42 #42
+    OFFICIAL_ROUNDS = 6 #42
     NUM_ROUNDS = PRACTICE_ROUNDS + OFFICIAL_ROUNDS  # 46 total
 
     # 参数 / パラメータ

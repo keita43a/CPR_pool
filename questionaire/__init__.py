@@ -234,8 +234,7 @@ class Page2(Page):
         'q_tryad17',
         'q_tryad18',
         'q_tryad19',
-        'q_tryad20',
-        'q_comment'
+        'q_tryad20'
     ]
 
 class Page3(Page):
@@ -249,8 +248,8 @@ class ResultsWaitPage(WaitPage):
     pass
 
 
-class Results(Page):
+class EndPage(Page):
     pass
 
 
-page_sequence = [Page1,Page2,Page3]
+page_sequence = [Page1,Page2,Page3,EndPage]
