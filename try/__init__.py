@@ -111,27 +111,27 @@ class Group(BaseGroup):
     stock_env    = models.StringField()
     total_H      = models.FloatField()
 
-def set_institution(self):
-    inst = self.subsession.institution
-    if inst == 'VOTE':
-        self.vote_result = all(p.voted_for_pooling for p in self.get_players())
-        self.is_pooling  = self.vote_result
-    else:
-        self.is_pooling  = (inst == 'POOL')
-        self.vote_result = False
+    def set_institution(self):
+        inst = self.subsession.institution
+        if inst == 'VOTE':
+            self.vote_result = all(p.voted_for_pooling for p in self.get_players())
+            self.is_pooling  = self.vote_result
+        else:
+            self.is_pooling  = (inst == 'POOL')
+            self.vote_result = False
 
-def set_payoffs(self):
-    players = self.get_players()
-    self.stock_env = self.subsession.stock
-    H = sum(p.effort for p in players)
-    self.total_H = H
-    b = C.STOCK_B[self.stock_env]
-    for p in players:
-        h = p.effort
-        c = C.C_HIGH if p.is_highliner else C.C_LOW
-        pi = h * (C.A - b * H) - c * h**2
-        p.payoff_raw = pi
-        p.payoff     = pi
+    def set_payoffs(self):
+        players = self.get_players()
+        self.stock_env = self.subsession.stock
+        H = sum(p.effort for p in players)
+        self.total_H = H
+        b = C.STOCK_B[self.stock_env]
+        for p in players:
+            h = p.effort
+            c = C.C_HIGH if p.is_highliner else C.C_LOW
+            pi = h * (C.A - b * H) - c * h**2
+            p.payoff_raw = pi
+            p.payoff     = pi
 
 
 class Player(BasePlayer):
