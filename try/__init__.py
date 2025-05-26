@@ -245,9 +245,9 @@ class Effort_input(Page):
         # Determine institution display text
         if ss.institution == 'VOTE':
             if gp.vote_result:
-                institution_display = "プール制（投票結果：賛成）"
+                institution_display = "プール制（投票結果：全員賛成）"
             else:
-                institution_display = "個人制（投票結果：反対）"
+                institution_display = "個人制（投票結果：一部反対）"
         elif ss.institution == 'POOL':
             institution_display = "プール制"
         else:  # IND
@@ -294,9 +294,9 @@ class Results(Page):
         # 制度表示テキストを決定（投票結果を含む）
         if ss.institution == 'VOTE':
             if gp.vote_result:
-                institution_display = "プール制（投票結果：賛成）"
+                institution_display = "プール制（投票結果：全員賛成）"
             else:
-                institution_display = "個人制（投票結果：反対）"
+                institution_display = "個人制（投票結果：一部反対）"
         elif ss.institution == 'POOL':
             institution_display = "プール制"
         else:  # IND
