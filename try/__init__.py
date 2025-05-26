@@ -62,44 +62,44 @@ class Subsession(BaseSubsession):
     stock       = models.StringField(initial=C.DEFAULT_STOCK_SYMBOL)
     import random
 
-def creating_session(self):
-    print(f"=== creating_session triggered for round {self.round_number} ===")
-    r = self.round_number
+    def creating_session(self):
+        print(f"=== creating_session triggered for round {self.round_number} ===")
+        r = self.round_number
 
-    # 设置模式：练习 or 正式 / モード設定：練習 or 本番
-    if r <= C.PRACTICE_ROUNDS:
-        idx = r
-        pattern = C.PRACTICE_PATTERNS[idx]
-        self.mode_type  = 'practice'
-        self.mode_index = idx
-        self.mode_round = 1
-    else:
-        off_r = r - C.PRACTICE_ROUNDS
-        block_size = C.OFFICIAL_ROUNDS // len(C.OFFICIAL_PATTERNS)
-        idx = ((off_r - 1) // block_size) + 1
-        pattern = C.OFFICIAL_PATTERNS[idx]
-        self.mode_type  = 'official'
-        self.mode_index = idx
-        self.mode_round = ((off_r - 1) % block_size) + 1
+        # 设置模式：练习 or 正式 / モード設定：練習 or 本番
+        if r <= C.PRACTICE_ROUNDS:
+            idx = r
+            pattern = C.PRACTICE_PATTERNS[idx]
+            self.mode_type  = 'practice'
+            self.mode_index = idx
+            self.mode_round = 1
+        else:
+            off_r = r - C.PRACTICE_ROUNDS
+            block_size = C.OFFICIAL_ROUNDS // len(C.OFFICIAL_PATTERNS)
+            idx = ((off_r - 1) // block_size) + 1
+            pattern = C.OFFICIAL_PATTERNS[idx]
+            self.mode_type  = 'official'
+            self.mode_index = idx
+            self.mode_round = ((off_r - 1) % block_size) + 1
 
-    self.institution = pattern['institution']
-    self.stock       = pattern['stock']
+        self.institution = pattern['institution']
+        self.stock       = pattern['stock']
 
-    # 只在第1轮：分配角色并写入 participant.vars / 第1ラウンドのみ：役割を割り当ててparticipant.varsに記録
-    if r == 1:
-        for group in self.get_groups():
-            players = group.get_players()
-            # 更稳妥的方法：打乱顺序后分配 / より安全な方法：順序をシャッフルしてから割り当て
-            random.shuffle(players)
-            half = len(players) // 2
-            for i, p in enumerate(players):
-                is_highliner = (i < half)
-                p.participant.vars['is_highliner'] = is_highliner
-                print(f"[Round 1 Assignment] Player {p.id_in_group} → {'Highliner' if is_highliner else 'Lowliner'}")
+        # 只在第1轮：分配角色并写入 participant.vars / 第1ラウンドのみ：役割を割り当ててparticipant.varsに記録
+        if r == 1:
+            for group in self.get_groups():
+                players = group.get_players()
+                # 更稳妥的方法：打乱顺序后分配 / より安全な方法：順序をシャッフルしてから割り当て
+                random.shuffle(players)
+                half = len(players) // 2
+                for i, p in enumerate(players):
+                    is_highliner = (i < half)
+                    p.participant.vars['is_highliner'] = is_highliner
+                    print(f"[Round 1 Assignment] Player {p.id_in_group} → {'Highliner' if is_highliner else 'Lowliner'}")
 
-    # 每轮都读回角色变量 / 毎ラウンド役割変数を読み戻し
-    for p in self.get_players():
-        print(f"[DEBUG] p.participant.vars['is_highliner'] = {p.participant.vars.get('is_highliner')}")
+        # 每轮都读回角色变量 / 毎ラウンド役割変数を読み戻し
+        for p in self.get_players():
+            print(f"[DEBUG] p.participant.vars['is_highliner'] = {p.participant.vars.get('is_highliner')}")
 
 
 class Group(BaseGroup):
