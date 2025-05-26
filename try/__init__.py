@@ -183,20 +183,38 @@ class Vote(Page):
             'stock_label': C.STOCK_LABELS[ss.stock],  # 辞書ルックアップを事前に解決
             'current_round': ss.round_number,
             'total_rounds': C.NUM_ROUNDS,
-            'mode_type_display': C.PHASE_DISPLAY.get(ss.mode_type, ss.mode_type),
+            'mode_type_display': C.PHASE_DISPLAY.get(ss.mode_type, ss.mode_type),  # 日本語フェーズ名
             'is_practice': (ss.mode_type == 'practice'),
             'mode_index': ss.mode_index,
             'mode_round': ss.mode_round,
             'institution': ss.institution,
+            'Constants': C,  # Constants オブジェクト全体も渡す
         }
 
 
 class VoteWaitPage(WaitPage):
     title_text = "Please wait for all players to vote"
     body_text  = "Other players are still voting."
+    
     @staticmethod
     def is_displayed(player: Player):
         return player.subsession.institution == 'VOTE'
+    
+    @staticmethod
+    def vars_for_template(player: Player):
+        """テンプレートで使用する変数を提供"""
+        ss = player.subsession
+        return {
+            'stock_label': C.STOCK_LABELS[ss.stock],  # 辞書ルックアップを事前に解決
+            'current_round': ss.round_number,
+            'total_rounds': C.NUM_ROUNDS,
+            'mode_type_display': C.PHASE_DISPLAY.get(ss.mode_type, ss.mode_type),  # 日本語フェーズ名
+            'is_practice': (ss.mode_type == 'practice'),
+            'mode_index': ss.mode_index,
+            'mode_round': ss.mode_round,
+            'institution': ss.institution,
+            'Constants': C,  # Constants オブジェクト全体も渡す
+        }
 
 
 class Effort_input(Page):
