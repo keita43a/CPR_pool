@@ -7,7 +7,7 @@ class C(BaseConstants):
 
     # 练习与正式轮次 / 練習と本番のラウンド
     PRACTICE_ROUNDS = 4
-    OFFICIAL_ROUNDS = 42
+    OFFICIAL_ROUNDS = 42 #42
     NUM_ROUNDS = PRACTICE_ROUNDS + OFFICIAL_ROUNDS  # 46 total
 
     # 参数 / パラメータ
@@ -60,46 +60,49 @@ class Subsession(BaseSubsession):
     mode_round  = models.IntegerField(initial=0)
     institution = models.StringField(initial=C.DEFAULT_INSTITUTION)
     stock       = models.StringField(initial=C.DEFAULT_STOCK_SYMBOL)
-    ##import random
+    import random
 
-    def creating_session(self):
-        print(f"=== creating_session triggered for round {self.round_number} ===")
-        r = self.round_number
+def creating_session(self):
+    print(f"=== creating_session triggered for round {self.round_number} ===")
+    r = self.round_number
 
-        # 设置模式：练习 or 正式 / モード設定：練習 or 本番
-        if r <= C.PRACTICE_ROUNDS:
-            idx = r
-            pattern = C.PRACTICE_PATTERNS[idx]
-            self.mode_type  = 'practice'
-            self.mode_index = idx
-            self.mode_round = 1
-        else:
-            off_r = r - C.PRACTICE_ROUNDS
-            block_size = C.OFFICIAL_ROUNDS // len(C.OFFICIAL_PATTERNS)
-            idx = ((off_r - 1) // block_size) + 1
-            pattern = C.OFFICIAL_PATTERNS[idx]
-            self.mode_type  = 'official'
-            self.mode_index = idx
-            self.mode_round = ((off_r - 1) % block_size) + 1
+    # 设置模式：练习 or 正式 / モード設定：練習 or 本番
+    if r <= C.PRACTICE_ROUNDS:
+        idx = r
+        pattern = C.PRACTICE_PATTERNS[idx]
+        self.mode_type  = 'practice'
+        self.mode_index = idx
+        self.mode_round = 1
+    else:
+        off_r = r - C.PRACTICE_ROUNDS
+        block_size = C.OFFICIAL_ROUNDS // len(C.OFFICIAL_PATTERNS)
+        idx = ((off_r - 1) // block_size) + 1
+        pattern = C.OFFICIAL_PATTERNS[idx]
+        self.mode_type  = 'official'
+        self.mode_index = idx
+        self.mode_round = ((off_r - 1) % block_size) + 1
 
-        self.institution = pattern['institution']
-        self.stock       = pattern['stock']
+    self.institution = pattern['institution']
+    self.stock       = pattern['stock']
 
-        # 只在第1轮：分配角色并写入 participant.vars / 第1ラウンドのみ：役割を割り当ててparticipant.varsに記録
-        if r == 1:
-            for group in self.get_groups():
-                players = group.get_players()
-                # 更稳妥的方法：打乱顺序后分配 / より安全な方法：順序をシャッフルしてから割り当て
-                random.shuffle(players)
-                half = len(players) // 2
-                for i, p in enumerate(players):
-                    is_highliner = (i < half)
-                    p.participant.vars['is_highliner'] = is_highliner
-                    print(f"[Round 1 Assignment] Player {p.id_in_group} → {'Highliner' if is_highliner else 'Lowliner'}")
+    print(f"Round {r}: mode_type={self.mode_type}, pattern_idx={self.mode_index}, institution={self.institution}, stock={self.stock}")
 
-        # 每轮都读回角色变量 / 毎ラウンド役割変数を読み戻し
-        for p in self.get_players():
-            print(f"[DEBUG] p.participant.vars['is_highliner'] = {p.participant.vars.get('is_highliner')}")
+
+    # 只在第1轮：分配角色并写入 participant.vars / 第1ラウンドのみ：役割を割り当ててparticipant.varsに記録
+    if r == 1:
+        for group in self.get_groups():
+            players = group.get_players()
+            # 更稳妥的方法：打乱顺序后分配 / より安全な方法：順序をシャッフルしてから割り当て
+            random.shuffle(players)
+            half = len(players) // 2
+            for i, p in enumerate(players):
+                is_highliner = (i < half)
+                p.participant.vars['is_highliner'] = is_highliner
+                print(f"[Round 1 Assignment] Player {p.id_in_group} → {'Highliner' if is_highliner else 'Lowliner'}")
+
+    # 每轮都读回角色变量 / 毎ラウンド役割変数を読み戻し
+    for p in self.get_players():
+        print(f"[DEBUG] p.participant.vars['is_highliner'] = {p.participant.vars.get('is_highliner')}")
 
 
 class Group(BaseGroup):
@@ -108,27 +111,27 @@ class Group(BaseGroup):
     stock_env    = models.StringField()
     total_H      = models.FloatField()
 
-    def set_institution(self):
-        inst = self.subsession.institution
-        if inst == 'VOTE':
-            self.vote_result = all(p.voted_for_pooling for p in self.get_players())
-            self.is_pooling  = self.vote_result
-        else:
-            self.is_pooling  = (inst == 'POOL')
-            self.vote_result = False
+def set_institution(self):
+    inst = self.subsession.institution
+    if inst == 'VOTE':
+        self.vote_result = all(p.voted_for_pooling for p in self.get_players())
+        self.is_pooling  = self.vote_result
+    else:
+        self.is_pooling  = (inst == 'POOL')
+        self.vote_result = False
 
-    def set_payoffs(self):
-        players = self.get_players()
-        self.stock_env = self.subsession.stock
-        H = sum(p.effort for p in players)
-        self.total_H = H
-        b = C.STOCK_B[self.stock_env]
-        for p in players:
-            h = p.effort
-            c = C.C_HIGH if p.is_highliner else C.C_LOW
-            pi = h * (C.A - b * H) - c * h**2
-            p.payoff_raw = pi
-            p.payoff     = pi
+def set_payoffs(self):
+    players = self.get_players()
+    self.stock_env = self.subsession.stock
+    H = sum(p.effort for p in players)
+    self.total_H = H
+    b = C.STOCK_B[self.stock_env]
+    for p in players:
+        h = p.effort
+        c = C.C_HIGH if p.is_highliner else C.C_LOW
+        pi = h * (C.A - b * H) - c * h**2
+        p.payoff_raw = pi
+        p.payoff     = pi
 
 
 class Player(BasePlayer):
@@ -164,7 +167,7 @@ class PracticeEnd(Page):
     def is_displayed(player: Player):
         return player.round_number == C.PRACTICE_ROUNDS + 1
     def vars_for_template(self):
-        return {'msg': '练习结束，正式实验现在开始！'}  # 練習終了、本実験を開始します！
+        return {'msg': '練習はこれで終了です。本番を開始します！'}  
 
 
 class Vote(Page):
@@ -174,7 +177,7 @@ class Vote(Page):
     @staticmethod
     def is_displayed(player: Player):
         return player.subsession.institution == 'VOTE'
-    
+
     @staticmethod
     def vars_for_template(player: Player):
         """テンプレートで使用する変数を提供"""
