@@ -47,6 +47,12 @@ class C(BaseConstants):
         'L': B_LOW,
     }
 
+    # フェーズ表示用の日本語辞書を追加
+    PHASE_DISPLAY = {
+        'practice': '練習',
+        'official': '本番',
+    }
+
        
 class Subsession(BaseSubsession):
     mode_type   = models.StringField(initial='')
@@ -102,27 +108,27 @@ class Group(BaseGroup):
     stock_env    = models.StringField()
     total_H      = models.FloatField()
 
-def set_institution(self):
-    inst = self.subsession.institution
-    if inst == 'VOTE':
-        self.vote_result = all(p.voted_for_pooling for p in self.get_players())
-        self.is_pooling  = self.vote_result
-    else:
-        self.is_pooling  = (inst == 'POOL')
-        self.vote_result = False
+    def set_institution(self):
+        inst = self.subsession.institution
+        if inst == 'VOTE':
+            self.vote_result = all(p.voted_for_pooling for p in self.get_players())
+            self.is_pooling  = self.vote_result
+        else:
+            self.is_pooling  = (inst == 'POOL')
+            self.vote_result = False
 
-def set_payoffs(self):
-    players = self.get_players()
-    self.stock_env = self.subsession.stock
-    H = sum(p.effort for p in players)
-    self.total_H = H
-    b = C.STOCK_B[self.stock_env]
-    for p in players:
-        h = p.effort
-        c = C.C_HIGH if p.is_highliner else C.C_LOW
-        pi = h * (C.A - b * H) - c * h**2
-        p.payoff_raw = pi
-        p.payoff     = pi
+    def set_payoffs(self):
+        players = self.get_players()
+        self.stock_env = self.subsession.stock
+        H = sum(p.effort for p in players)
+        self.total_H = H
+        b = C.STOCK_B[self.stock_env]
+        for p in players:
+            h = p.effort
+            c = C.C_HIGH if p.is_highliner else C.C_LOW
+            pi = h * (C.A - b * H) - c * h**2
+            p.payoff_raw = pi
+            p.payoff     = pi
 
 
 class Player(BasePlayer):
@@ -187,8 +193,9 @@ class Effort_input(Page):
         # 计算一下是练习阶段还是正式阶段 / 練習段階か本番段階かを計算
         is_practice = (ss.mode_type == 'practice')
         # 首字母大写用于展示 / 表示用に最初の文字を大文字にする
-        mode_type_display = ss.mode_type.capitalize() if ss.mode_type else ''
-
+        ##mode_type_display = ss.mode_type.capitalize() if ss.mode_type else ''
+        # 日本語表示に変更
+        mode_type_display = C.PHASE_DISPLAY.get(ss.mode_type, ss.mode_type)
         return {
             'stock_label': C.STOCK_LABELS[ss.stock],
             'b': C.B_HIGH if ss.stock == 'H' else C.B_LOW,
@@ -222,7 +229,9 @@ class Results(Page):
         # 练习/正式 判断 / 練習/本番 判定
         is_practice = (ss.mode_type == 'practice')
         # 首字母大写的 Phase 文本 / 最初の文字を大文字にしたPhaseテキスト
-        mode_type_display = ss.mode_type.capitalize() if ss.mode_type else ''
+        ##mode_type_display = ss.mode_type.capitalize() if ss.mode_type else ''
+        # 日本語表示に変更
+        mode_type_display = C.PHASE_DISPLAY.get(ss.mode_type, ss.mode_type)
         # 每个模式的轮数：练习=1，正式=OFFICIAL_ROUNDS/6=7 / 各モードのラウンド数：練習=1、本番=OFFICIAL_ROUNDS/6=7
         pattern_length = 1 if is_practice else C.OFFICIAL_ROUNDS // len(C.OFFICIAL_PATTERNS)
 
