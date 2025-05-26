@@ -1,71 +1,71 @@
+
 {% extends "global/Page.html" %}
 {% load otree static %}
 
-{% block title %}Introduction{% endblock %}
+{% block title %}はじめに{% endblock %}
 
 {% block content %}
-  <h2>Welcome to the Fishery Game Experiment</h2>
+  <h2>漁業ゲーム実験へようこそ</h2>
 
   <p>
-    You and {{ Constants.PLAYERS_PER_GROUP }} participants form a group of {{ Constants.PLAYERS_PER_GROUP }} fishers.  
-    Each round, you choose how much effort to exert in harvesting fish.
+    あなたと{{ Constants.PLAYERS_PER_GROUP }}名の参加者で{{ Constants.PLAYERS_PER_GROUP }}人の漁師グループを形成します。
+    各ラウンドで、魚の漁獲にどの程度の努力を投入するかを選択します。
   </p>
 
   <p>
-    There are two types of players: <strong>Highliners</strong> and <strong>Lowliners</strong>.  
-    Highliners are more productive per unit of effort; Lowliners less so.  
-    Your role will remain fixed throughout.
+    プレイヤーには2つのタイプがあります：<strong>ハイライナー</strong>と<strong>ローライナー</strong>です。
+    ハイライナーは単位努力あたりの生産性が高く、ローライナーは低くなっています。
+    あなたの役割は実験を通じて固定されます。
   </p>
 
-  <h3>Experiment overview</h3>
-  <p><strong>Total rounds:</strong> {{ Constants.NUM_ROUNDS }} ({{ Constants.PRACTICE_ROUNDS }} practice, then {{ Constants.OFFICIAL_ROUNDS }} formal)</p>
+  <h3>実験の概要</h3>
+  <p><strong>総ラウンド数:</strong> {{ Constants.NUM_ROUNDS }}（練習{{ Constants.PRACTICE_ROUNDS }}回、本実験{{ Constants.OFFICIAL_ROUNDS }}回）</p>
 
   <ul>
     <li>
-      <strong>Practice phase:</strong> {{ Constants.PRACTICE_ROUNDS }} rounds, in {{ Constants.PRACTICE_ROUNDS }} practice modes (1 round each):
+      <strong>練習フェーズ:</strong> {{ Constants.PRACTICE_ROUNDS }}ラウンド、{{ Constants.PRACTICE_ROUNDS }}つの練習モード（各1ラウンド）:
       <ol>
-        <li>High resource, individual (IND)</li>
-        <li>Low resource, individual (IND)</li>
-        <li>High resource, pooling (POOL)</li>
-        <li>Low resource, pooling (POOL)</li>
+        <li>広い漁場、個人操業制度（IND）</li>
+        <li>狭い漁場、個人操業制度（IND）</li>
+        <li>広い漁場、プール制度（POOL）</li>
+        <li>狭い漁場、プール制度（POOL）</li>
       </ol>
     </li>
     <li>
-      <strong>Formal phase:</strong> {{ Constants.OFFICIAL_ROUNDS }} rounds, in 6 modes (7 rounds each):
+      <strong>本実験フェーズ:</strong> {{ Constants.OFFICIAL_ROUNDS }}ラウンド、6つのモード（各7ラウンド）:
       <ol>
-        <li>High resource, individual (IND)</li>
-        <li>Low resource, individual (IND)</li>
-        <li>High resource, pooling (POOL)</li>
-        <li>Low resource, pooling (POOL)</li>
-        <li>High resource, vote to pool (VOTE)</li>
-        <li>Low resource, vote to pool (VOTE)</li>
+        <li>広い漁場、個人操業制度（IND）</li>
+        <li>狭い漁場、個人操業制度（IND）</li>
+        <li>広い漁場、プール制度（POOL）</li>
+        <li>狭い漁場、プール制度（POOL）</li>
+        <li>広い漁場、プール制度の投票（VOTE）</li>
+        <li>狭い漁場、プール制度の投票（VOTE）</li>
       </ol>
     </li>
   </ul>
 
-  <h3>Voting</h3>
+  <h3>投票について</h3>
   <p>
-    In the two VOTE modes, you will vote on adopting a 
-    <strong>pooling system</strong> (share total revenue equally) 
-    or keeping a <strong>decentralized system</strong> 
-    (each earns based on own harvest).  
-    Pooling only occurs if <strong>all agree</strong>.
+    2つのVOTEモードでは、
+    <strong>プール制度</strong>（総収入を均等に分配）の採用か、
+    <strong>個人操業制度</strong>（各自の漁獲量に基づく収入）の維持かを投票で決定します。
+    プール制度は<strong>全員が同意</strong>した場合にのみ採用されます。
   </p>
 
-  <h3>Harvesting</h3>
-  <p>Your harvest depends on:</p>
+  <h3>漁獲について</h3>
+  <p>あなたの漁獲量は以下に依存します：</p>
   <ul>
-    <li>Your effort</li>
-    <li>Your productivity (Highliner vs Lowliner)</li>
-    <li>Total group effort (congestion externality)</li>
-    <li>Resource availability (high vs low stock)</li>
+    <li>あなたの操業日数</li>
+    <li>あなたの生産性（ハイライナー vs ローライナー）</li>
+    <li>グループ全体の操業日数（混雑の外部効果）</li>
+    <li>漁場タイプ（広い漁場 vs 狭い漁場）</li>
   </ul>
 
   <p>
-    Read carefully and ask the experimenter if you have any questions.
+    注意深くお読みいただき、ご質問がある場合は実験者にお尋ねください。
   </p>
 
-  <p><strong>Click "Next" to begin the practice phase.</strong></p>
+  <p><strong>「次へ」をクリックして練習フェーズを開始してください。</strong></p>
 
   {% next_button %}
 {% endblock %}

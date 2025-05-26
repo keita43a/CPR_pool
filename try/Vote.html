@@ -1,39 +1,40 @@
+
 {% extends "global/Page.html" %}
 {% load otree static %}
 
-{% block title %}Vote on Institution{% endblock %}
+{% block title %}制度への投票{% endblock %}
 
 {% block content %}
   <p>
-    Please vote for the institutional setting you prefer for this round:
+    このラウンドで希望する制度設定に投票してください：
   </p>
 
   <form method="post">
     {% csrf_token %}
-    {% formfield player.voted_for_pooling label="Do you want to adopt the pooling system this round?" %}
-    <button class="btn btn-primary" type="submit">Submit Vote</button>
+    {% formfield player.voted_for_pooling label="このラウンドでプール制度を採用しますか？" %}
+    <button class="btn btn-primary" type="submit">投票を送信</button>
   </form>
 
   <hr>
 
-  <p><strong>Your Role:</strong>
-    {% if player.is_highliner %}Highliner{% else %}Lowliner{% endif %}
+  <p><strong>あなたの役割:</strong>
+    {% if player.is_highliner %}ハイライナー{% else %}ローライナー{% endif %}
   </p>
 
-  <p><strong>Stock Environment:</strong>
+  <p><strong>資源環境:</strong>
     {{ Constants.STOCK_LABELS[subsession.stock] }}
   </p>
 
-  <p><strong>Round:</strong>
+  <p><strong>ラウンド:</strong>
     {{ player.round_number }} / {{ Constants.NUM_ROUNDS }}
   </p>
 
-  <p><strong>Mode:</strong>
-    {{ subsession.mode_type|capfirst }} mode {{ subsession.mode_index }}
-    (round {{ subsession.mode_round }})
+  <p><strong>モード:</strong>
+    {{ subsession.mode_type|capfirst }}モード {{ subsession.mode_index }}
+    （ラウンド {{ subsession.mode_round }}）
   </p>
 
   <p><strong>
-    This round will use pooling <em>only</em> if <em>all</em> players vote for it.
+    このラウンドでプール制度が採用されるのは、<em>全プレイヤー</em>が賛成票を投じた場合<em>のみ</em>です。
   </strong></p>
 {% endblock %}

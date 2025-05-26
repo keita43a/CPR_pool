@@ -1,22 +1,24 @@
+
 {% extends "global/Page.html" %}
 {% load otree static %}
 
-{% block title %}Effort Decision{% endblock %}
+{% block title %}操業日数の決定{% endblock %}
 
 {% block content %}
-  <p>Please enter your effort level for this round.</p>
+  <p><strong>フェーズ:</strong> {{ mode_type_display }} </p>
+  <p><strong>モード {{ mode_index }}:</strong>
+     ラウンド {{ mode_round }} / {% if is_practice %}1{% else %}7{% endif %}
+  </p>
+  <p><strong>全体操業回数:</strong> {{ current_round }} / {{ total_rounds }}</p>
+  <p><strong>制度:</strong> {{ institution_for_display }}</p>
+  <p><strong>漁場タイプ:</strong> {{ stock_label }}</p>
+
+  <p>このラウンドの操業日数を入力してください。</p>
 
   {% formfields %}
-  <button class="btn btn-primary">Submit</button>
+  <button class="btn btn-primary">送信</button>
 
   <hr>
 
-  <p><strong>Phase:</strong> {{ mode_type_display }} </p>
-  <p><strong>Mode {{ mode_index }}:</strong>
-     Round {{ mode_round }} of {% if is_practice %}1{% else %}7{% endif %}
-  </p>
-  <p><strong>Overall Round:</strong> {{ current_round }} / {{ total_rounds }}</p>
-  <p><strong>Your Role:</strong> {{ role }}</p>
-  <p><strong>Institution:</strong> {{ institution_for_display }}</p>
-  <p><strong>Resource Level:</strong> {{ stock_label }}</p>
+
 {% endblock %}

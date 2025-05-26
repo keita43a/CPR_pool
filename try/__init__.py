@@ -39,8 +39,8 @@ class C(BaseConstants):
 
     # 页面上显示 / ページ上の表示
     STOCK_LABELS = {
-        'H': 'High resource (b=0.5)',
-        'L': 'Low resource (b=1.5)',
+        'H': '広い漁場',
+        'L': '狭い漁場',
     }
     STOCK_B = {
         'H': B_HIGH,

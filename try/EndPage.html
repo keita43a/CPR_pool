@@ -1,13 +1,13 @@
+
 {% extends "global/Page.html" %}
 {% load otree static %}
 
-{% block title %}Experiment Completed{% endblock %}
+{% block title %}実験終了{% endblock %}
 
 {% block content %}
   <h2>{{ msg }}</h2>
   <p>
-    <a href="{{ form_url }}" target="_blank">
-      Click here to fill out our feedback form
-    </a>
+      次へを押して、参加者アンケートにお応えください。
   </p>
+    {% next_button %}
 {% endblock %}

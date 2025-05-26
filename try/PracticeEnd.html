@@ -1,14 +1,15 @@
+
 {% extends "global/Page.html" %}
 {% load otree static %}
 
-{% block title %}Practice Complete{% endblock %}
+{% block title %}練習完了{% endblock %}
 
 {% block content %}
   <div class="alert alert-info">
     <h3>{{ msg }}</h3>
   </div>
 
-  <p>Your practice rounds are over. Click “Next” to begin the formal experiment.</p>
+  <p>練習ラウンドが終了しました。「次へ」をクリックして本実験を開始してください。</p>
 
   {% next_button %}
 {% endblock %}

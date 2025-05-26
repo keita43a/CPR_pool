@@ -1,30 +1,31 @@
+
 {% extends "global/Page.html" %}
 {% load otree static %}
 
-{% block title %}Round Results{% endblock %}
+{% block title %}ラウンド結果{% endblock %}
 
 {% block content %}
-  <h4>Round Summary</h4>
+  <h4>ラウンド概要</h4>
 
-  <p><strong>Phase:</strong> {{ mode_type_display }} phase</p>
-  <p><strong>Mode {{ mode_index }}:</strong>
-    Round {{ mode_round }} of {{ pattern_length }}
+  <p><strong>フェーズ:</strong> {{ mode_type_display }}フェーズ</p>
+  <p><strong>モード {{ mode_index }}:</strong>
+    ラウンド {{ mode_round }} / {{ pattern_length }}
   </p>
-  <p><strong>Overall Round:</strong> {{ current_round }} / {{ total_rounds }}</p>
+  <p><strong>全体ラウンド:</strong> {{ current_round }} / {{ total_rounds }}</p>
 
-  <p><strong>Your Role:</strong> {{ role }}</p>
-  <p><strong>Institution Used:</strong> {{ player.subsession.institution }}</p>
-  <p><strong>Resource Level:</strong> {{ stock_env }}</p>
-
-  <hr>
-  <p><strong>Total Group Harvest (H):</strong> {{ total_H }}</p>
+  <p><strong>あなたの役割:</strong> {{ role }}</p>
+  <p><strong>使用された制度:</strong> {{ player.subsession.institution }}</p>
+  <p><strong>漁場タイプ:</strong> {{ stock_env }}</p>
 
   <hr>
-  <h5>Your Performance</h5>
-  <p><strong>Your Effort:</strong> {{ my_effort }}</p>
-  <p><strong>Your Payoff:</strong> {{ my_payoff }}</p>
+  <p><strong>グループ総漁獲量（H）:</strong> {{ total_H }}</p>
 
   <hr>
-  <p>Click “Next” to continue.</p>
+  <h5>あなたの成績</h5>
+  <p><strong>あなたの操業日数:</strong> {{ my_effort }}</p>
+  <p><strong>あなたの利得:</strong> {{ my_payoff }}</p>
+
+  <hr>
+  <p>「次へ」をクリックして続行してください。</p>
   {% next_button %}
 {% endblock %}
