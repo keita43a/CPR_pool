@@ -3,7 +3,7 @@ import random
 
 class C(BaseConstants):
     NAME_IN_URL = 'try'
-    PLAYERS_PER_GROUP = 2
+    PLAYERS_PER_GROUP = None  # 実験者が入力する
 
     # 练习与正式轮次 / 練習と本番のラウンド
     PRACTICE_ROUNDS = 4
@@ -66,7 +66,7 @@ def creating_session(self):
     ##print(f"=== creating_session triggered for round {self.round_number} ===")
     r = self.round_number
 
-    # 设置模式：练习 or 正式 / モード設定：練習 or 本番
+    # ラウンドタイプ設定：練習 or 本番
     if r <= C.PRACTICE_ROUNDS:
         idx = r
         pattern = C.PRACTICE_PATTERNS[idx]
@@ -88,7 +88,7 @@ def creating_session(self):
     ##print(f"Round {r}: mode_type={self.mode_type}, pattern_idx={self.mode_index}, institution={self.institution}, stock={self.stock}")
 
 
-    # 只在第1轮：分配角色并写入 participant.vars / 第1ラウンドのみ：役割を割り当ててparticipant.varsに記録
+    # 第1ラウンドのみ：役割を割り当ててparticipant.varsに記録
     if r == 1:
         for group in self.get_groups():
             players = group.get_players()
@@ -100,7 +100,7 @@ def creating_session(self):
                 p.participant.vars['is_highliner'] = is_highliner
                 print(f"[Round 1 Assignment] Player {p.id_in_group} → {'Highliner' if is_highliner else 'Lowliner'}")
 
-    # 每轮都读回角色变量 / 毎ラウンド役割変数を読み戻し
+    # 毎ラウンド役割変数を読み戻し
     for p in self.get_players():
         print(f"[DEBUG] p.participant.vars['is_highliner'] = {p.participant.vars.get('is_highliner')}")
 
