@@ -18,6 +18,16 @@ SESSION_CONFIG_DEFAULTS = dict(
     doc="",
 )
 
+# Persistent link: Rooms
+ROOMS = [
+    dict(
+        name='participants_link',
+        display_name='Participants Link',
+        participant_label_file='_rooms/label.txt',
+        use_secure_urls=True
+    )
+]
+
 # persist role assignment
 PARTICIPANT_FIELDS = ['is_highliner']
 
