@@ -180,15 +180,16 @@ class Vote(Page):
         """テンプレートで使用する変数を提供"""
         ss = player.subsession
         return {
-            'stock_label': C.STOCK_LABELS[ss.stock],  # 辞書ルックアップを事前に解決
+            'stock_label': C.STOCK_LABELS[ss.stock],  # テンプレートの {{ stock_label }} 用
             'current_round': ss.round_number,
             'total_rounds': C.NUM_ROUNDS,
-            'mode_type_display': C.PHASE_DISPLAY.get(ss.mode_type, ss.mode_type),  # 日本語フェーズ名
+            'mode_type_display': C.PHASE_DISPLAY.get(ss.mode_type, ss.mode_type),  # テンプレートの {{ mode_type_display }} 用
             'is_practice': (ss.mode_type == 'practice'),
             'mode_index': ss.mode_index,
             'mode_round': ss.mode_round,
             'institution': ss.institution,
-            'Constants': C,  # Constants オブジェクト全体も渡す
+            'Constants': C,  # テンプレートの {{ Constants.NUM_ROUNDS }} 用
+            'subsession': ss,  # テンプレートの {{ subsession.mode_index }} などのために必要
         }
 
 
