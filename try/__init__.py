@@ -127,7 +127,12 @@ def set_payoffs(self):
 
 class Player(BasePlayer):
     voted_for_pooling = models.BooleanField(blank=True, initial=False)
-    effort = models.FloatField(min=0, initial=0.0)
+    effort = models.IntegerField(
+        min=0, 
+        max=24, 
+        choices=[(i, str(i)) for i in range(25)],  # 0から24までの選択肢
+        initial=0
+    )
     payoff_raw = models.FloatField(initial=0.0)
 
     @property
