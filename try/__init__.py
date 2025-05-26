@@ -92,17 +92,42 @@ def creating_session(self):
     if r == 1:
         for group in self.get_groups():
             players = group.get_players()
-            # 更稳妥的方法：打乱顺序后分配 / より安全な方法：順序をシャッフルしてから割り当て
-            ## random.shuffle(players)
-            half = len(players) // 2
-            for i, p in enumerate(players):
-                is_highliner = (i < half)
-                p.participant.vars['is_highliner'] = is_highliner
-                print(f"[Round 1 Assignment] Player {p.id_in_group} → {'Highliner' if is_highliner else 'Lowliner'}")
+            # 
+            ## random.shuffle(players) # シャッフルしてから割当
+            # 出席者をlabel番号でソート
+            players_with_labels = []
+            for p in players:
+                try:
+                    if p.participant.label and p.participant.label.startswith('label'):
+                        label_number = int(p.participant.label.replace('label', ''))
+                    else:
+                        label_number = p.id_in_group
+                    players_with_labels.append((p, label_number))
+                except (ValueError, AttributeError):
+                    players_with_labels.append((p, p.id_in_group))
+            
+            # label番号でソート（小さい番号から）
+            players_with_labels.sort(key=lambda x: x[1])
+            
+            # 奇数の場合はHighlinerが1人多くなるように計算
+            total_players = len(players_with_labels)
+            highliner_count = (total_players + 1) // 2  # 奇数時は切り上げ
+            
+            for i, (player, label_number) in enumerate(players_with_labels):
+                is_highliner = (i < highliner_count)  # 前半がHighliner
+                player.participant.vars['is_highliner'] = is_highliner
+                
+                role_name = 'Highliner' if is_highliner else 'Lowliner'
+                print(f"[Assignment] {player.participant.label} (#{label_number}) → {role_name}")
+            
+            lowliner_count = total_players - highliner_count
+            print(f"Total: {highliner_count} Highliners, {lowliner_count} Lowliners")
 
-    # 毎ラウンド役割変数を読み戻し
-    for p in self.get_players():
-        print(f"[DEBUG] p.participant.vars['is_highliner'] = {p.participant.vars.get('is_highliner')}")
+    # デバッグ用ログ
+    ##for p in self.get_players():
+    ##    label = getattr(p.participant, 'label', 'No label')
+    ##    is_highliner = p.participant.vars.get('is_highliner', 'Not set')
+    ##   print(f"[DEBUG] Label: {label}, is_highliner: {is_highliner}")
 
 
 class Group(BaseGroup):
