@@ -63,7 +63,7 @@ class Subsession(BaseSubsession):
     import random
 
 def creating_session(self):
-    print(f"=== creating_session triggered for round {self.round_number} ===")
+    ##print(f"=== creating_session triggered for round {self.round_number} ===")
     r = self.round_number
 
     # 设置模式：练习 or 正式 / モード設定：練習 or 本番
@@ -85,7 +85,7 @@ def creating_session(self):
     self.institution = pattern['institution']
     self.stock       = pattern['stock']
 
-    print(f"Round {r}: mode_type={self.mode_type}, pattern_idx={self.mode_index}, institution={self.institution}, stock={self.stock}")
+    ##print(f"Round {r}: mode_type={self.mode_type}, pattern_idx={self.mode_index}, institution={self.institution}, stock={self.stock}")
 
 
     # 只在第1轮：分配角色并写入 participant.vars / 第1ラウンドのみ：役割を割り当ててparticipant.varsに記録
@@ -114,10 +114,10 @@ class Group(BaseGroup):
     def set_institution(self):
         inst = self.subsession.institution
         if inst == 'VOTE':
-            self.vote_result = all(p.voted_for_pooling for p in self.get_players())
-            self.is_pooling  = self.vote_result
+            # Vote result already calculated in VoteWaitPage, just set is_pooling
+            self.is_pooling = self.vote_result
         else:
-            self.is_pooling  = (inst == 'POOL')
+            self.is_pooling = (inst == 'POOL')
             self.vote_result = False
 
     def set_payoffs(self):
@@ -190,7 +190,7 @@ class Vote(Page):
             'is_practice': (ss.mode_type == 'practice'),
             'mode_index': ss.mode_index,
             'mode_round': ss.mode_round,
-            'institution': ss.institution,
+            'institution_for_display': ss.institution,
             'Constants': C,  # テンプレートの {{ Constants.NUM_ROUNDS }} 用
             'subsession': ss,  # テンプレートの {{ subsession.mode_index }} などのために必要
         }
@@ -203,6 +203,13 @@ class VoteWaitPage(WaitPage):
     @staticmethod
     def is_displayed(player: Player):
         return player.subsession.institution == 'VOTE'
+    
+    # Add this method to calculate vote result after voting
+    @staticmethod
+    def after_all_players_arrive(group: Group):
+        if group.subsession.institution == 'VOTE':
+            group.vote_result = all(p.voted_for_pooling for p in group.get_players())
+            group.is_pooling = group.vote_result
     
     @staticmethod
     def vars_for_template(player: Player):
@@ -228,12 +235,23 @@ class Effort_input(Page):
     @staticmethod
     def vars_for_template(player: Player):
         ss = player.subsession
+        gp = player.group  # Add this line
         # 计算一下是练习阶段还是正式阶段 / 練習段階か本番段階かを計算
         is_practice = (ss.mode_type == 'practice')
         # 首字母大写用于展示 / 表示用に最初の文字を大文字にする
         ##mode_type_display = ss.mode_type.capitalize() if ss.mode_type else ''
         # 日本語表示に変更
         mode_type_display = C.PHASE_DISPLAY.get(ss.mode_type, ss.mode_type)
+        # Determine institution display text
+        if ss.institution == 'VOTE':
+            if gp.vote_result:
+                institution_display = "プール制（投票結果：賛成）"
+            else:
+                institution_display = "個人制（投票結果：反対）"
+        elif ss.institution == 'POOL':
+            institution_display = "プール制"
+        else:  # IND
+            institution_display = "個人制"
         return {
             'stock_label': C.STOCK_LABELS[ss.stock],
             'b': C.B_HIGH if ss.stock == 'H' else C.B_LOW,
@@ -244,8 +262,9 @@ class Effort_input(Page):
             'is_practice': is_practice,              # 用于模板里的 if 判断 / テンプレート内のif判断用
             'mode_index': ss.mode_index,
             'mode_round': ss.mode_round,
-            'institution_for_display': ss.institution,
+            'institution_for_display': institution_display,
             'is_highliner': player.is_highliner,
+            'vote_result': gp.vote_result if ss.institution == 'VOTE' else None,  # Add this for template use
         }
 
 
@@ -272,7 +291,16 @@ class Results(Page):
         mode_type_display = C.PHASE_DISPLAY.get(ss.mode_type, ss.mode_type)
         # 每个模式的轮数：练习=1，正式=OFFICIAL_ROUNDS/6=7 / 各モードのラウンド数：練習=1、本番=OFFICIAL_ROUNDS/6=7
         pattern_length = 1 if is_practice else C.OFFICIAL_ROUNDS // len(C.OFFICIAL_PATTERNS)
-
+        # 制度表示テキストを決定（投票結果を含む）
+        if ss.institution == 'VOTE':
+            if gp.vote_result:
+                institution_display = "プール制（投票結果：賛成）"
+            else:
+                institution_display = "個人制（投票結果：反対）"
+        elif ss.institution == 'POOL':
+            institution_display = "プール制"
+        else:  # IND
+            institution_display = "個人制"
         return {
             'stock_env':   C.STOCK_LABELS[gp.stock_env],
             'total_H':     gp.total_H,
@@ -285,7 +313,10 @@ class Results(Page):
             'is_practice':      is_practice,
             'mode_index':       ss.mode_index,
             'mode_round':       ss.mode_round,
-            'pattern_length':   pattern_length,
+            'pattern_length':   pattern_length, 
+            'institution_for_display': institution_display,  # 追加
+            'vote_result': gp.vote_result if ss.institution == 'VOTE' else None,  # 追加（テンプレートで必要な場合）
+        
         }
 
 
