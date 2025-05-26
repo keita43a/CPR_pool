@@ -60,7 +60,7 @@ class Subsession(BaseSubsession):
     mode_round  = models.IntegerField(initial=0)
     institution = models.StringField(initial=C.DEFAULT_INSTITUTION)
     stock       = models.StringField(initial=C.DEFAULT_STOCK_SYMBOL)
-    import random
+    ##import random
 
     def creating_session(self):
         print(f"=== creating_session triggered for round {self.round_number} ===")
@@ -170,9 +170,25 @@ class PracticeEnd(Page):
 class Vote(Page):
     form_model = 'player'
     form_fields = ['voted_for_pooling']
+    
     @staticmethod
     def is_displayed(player: Player):
         return player.subsession.institution == 'VOTE'
+    
+    @staticmethod
+    def vars_for_template(player: Player):
+        """テンプレートで使用する変数を提供"""
+        ss = player.subsession
+        return {
+            'stock_label': C.STOCK_LABELS[ss.stock],  # 辞書ルックアップを事前に解決
+            'current_round': ss.round_number,
+            'total_rounds': C.NUM_ROUNDS,
+            'mode_type_display': C.PHASE_DISPLAY.get(ss.mode_type, ss.mode_type),
+            'is_practice': (ss.mode_type == 'practice'),
+            'mode_index': ss.mode_index,
+            'mode_round': ss.mode_round,
+            'institution': ss.institution,
+        }
 
 
 class VoteWaitPage(WaitPage):
