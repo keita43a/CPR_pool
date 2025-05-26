@@ -11,8 +11,8 @@ class C(BaseConstants):
     NUM_ROUNDS = PRACTICE_ROUNDS + OFFICIAL_ROUNDS  # 46 total
 
     # 参数 / パラメータ
-    C_LOW = 2
-    C_HIGH = 4
+    C_1 = 2
+    C_2 = 4
     A = 150
     B_HIGH = 0.5
     B_LOW = 1.5
@@ -93,7 +93,7 @@ def creating_session(self):
         for group in self.get_groups():
             players = group.get_players()
             # 更稳妥的方法：打乱顺序后分配 / より安全な方法：順序をシャッフルしてから割り当て
-            random.shuffle(players)
+            ## random.shuffle(players)
             half = len(players) // 2
             for i, p in enumerate(players):
                 is_highliner = (i < half)
@@ -128,7 +128,7 @@ class Group(BaseGroup):
         b = C.STOCK_B[self.stock_env]
         for p in players:
             h = p.effort
-            c = C.C_HIGH if p.is_highliner else C.C_LOW
+            c = C.C_1 if p.is_highliner else C.C_2
             pi = h * (C.A - b * H) - c * h**2
             p.payoff_raw = pi
             p.payoff     = pi
