@@ -146,17 +146,30 @@ class Group(BaseGroup):
             self.vote_result = False
 
     def set_payoffs(self):
-        players = self.get_players()
-        self.stock_env = self.subsession.stock
-        H = sum(p.effort for p in players)
-        self.total_H = H
-        b = C.STOCK_B[self.stock_env]
-        for p in players:
-            h = p.effort
-            c = C.C_1 if p.is_highliner else C.C_2
-            pi = h * (C.A - b * H) - c * h**2
-            p.payoff_raw = pi
-            p.payoff     = pi
+        if self.is_pooling:
+            # プール制の場合、全員の努力を合計してから計算 / プール制の場合、全員の努力を合計してから計算
+            players = self.get_players()
+            H = sum(p.effort for p in players)
+            self.total_H = H
+            b = C.STOCK_B[self.stock_env]
+            for p in players:
+                h = p.effort
+                c = C.C_1 if p.is_highliner else C.C_2
+                pi = ((C.A * H - b * H ** 2)) / len(players) - c * h**2
+                p.payoff_raw = pi
+                p.payoff     = pi
+        else:
+            players = self.get_players()
+            self.stock_env = self.subsession.stock
+            H = sum(p.effort for p in players)
+            self.total_H = H
+            b = C.STOCK_B[self.stock_env]
+            for p in players:
+                h = p.effort
+                c = C.C_1 if p.is_highliner else C.C_2
+                pi = h * (C.A - b * H) - c * h**2
+                p.payoff_raw = pi
+                p.payoff     = pi
 
 
 class Player(BasePlayer):
