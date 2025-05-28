@@ -7,7 +7,7 @@ class C(BaseConstants):
 
     # 练习与正式轮次 / 練習と本番のラウンド
     PRACTICE_ROUNDS = 4
-    OFFICIAL_ROUNDS = 6 # 6の倍数。今回は42（各ラウンドで7回）
+    OFFICIAL_ROUNDS = 42 # 6の倍数。今回は42（各ラウンドで7回）
     NUM_ROUNDS = PRACTICE_ROUNDS + OFFICIAL_ROUNDS  # 46 total
 
     # 参数 / パラメータ
